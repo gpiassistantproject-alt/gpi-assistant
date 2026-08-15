@@ -13,11 +13,7 @@ jobs:
 
     - name: Unzip project files
       run: |
-        if [ -f "gpi-assistant (1).zip" ]; then
-          unzip -o "gpi-assistant (1).zip"
-        elif [ -f "gpi-assistant.zip" ]; then
-          unzip -o "gpi-assistant.zip"
-        fi
+        unzip -o "*.zip"
 
     - name: set up JDK 17
       uses: actions/setup-java@v3
