@@ -14,9 +14,14 @@ jobs:
     - name: Unzip project files
       run: |
         unzip -o "*.zip"
+        # zip ফাইলের ভেতর ফোল্ডার থাকলে ভেতরের সব ফাইল বাইরে নিয়ে আসার কমান্ড
+        if [ ! -f "gradlew" ]; then
+          mv */* . 2>/dev/null || true
+          mv */.* . 2>/dev/null || true
+        fi
 
     - name: set up JDK 17
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
         java-version: '17'
         distribution: 'temurin'
@@ -31,4 +36,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: app-debug
-        path: app/build/outputs/apk/debug/app-debug.apk
+        path: "**/build/outputs/apk/debug/*.apk"
