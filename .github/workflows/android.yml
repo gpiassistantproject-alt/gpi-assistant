@@ -9,24 +9,33 @@ jobs:
 
     - name: Unzip project files
       run: |
-        unzip -o *.zip
-        rm -rf *.zip
+        unzip -o gpi-assistant.zip
+        if [ -d "gpi-assistant" ]; then mv gpi-assistant/* . ; fi
 
-    - name: Set up JDK 17
+    - name: Generate Dummy Debug Keystore
+      run: |
+        keytool -genkey -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
+
+    - name: Set up JDK 21
       uses: actions/setup-java@v4
       with:
-        java-version: '17'
+        java-version: '21'
         distribution: 'temurin'
 
-    - name: Install Gradle and Build
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v3
+
+    - name: Build Debug APK
       run: |
-        sudo apt-get update
-        sudo apt-get install -y gradle
-        gradle assembleDebug
+        chmod +x gradlew || true
+        if [ -f "./gradlew" ]; then
+          ./gradlew assembleDebug -Dorg.gradle.jvmargs="--add-opens=java.base/java.lang=ALL-UNNAMED"
+        else
+          gradle assembleDebug -Dorg.gradle.jvmargs="--add-opens=java.base/java.lang=ALL-UNNAMED"
+        fi
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
         name: app-debug
-        path: "**/build/outputs/apk/debug/*.apk"
-
+        path: "*/build/outputs/apk/debug/.apk"
